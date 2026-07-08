@@ -25,6 +25,9 @@
                 <th>Apellido</th>
                 <th>Correo</th>
                 <th>Rol</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+
             </tr>
         </thead>
 
@@ -38,7 +41,63 @@
                 <td>{{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.role }}</td>
-            </tr>
+                <td>
+
+    {% if user.is_active %}
+
+        <span class="badge bg-success">
+
+            Activo
+
+        </span>
+
+    {% else %}
+
+        <span class="badge bg-danger">
+
+            Inactivo
+
+        </span>
+
+    {% endif %}
+
+</td>
+<td>
+
+    <a href="{{ url_for('users.edit', user_id=user.id) }}"
+       class="btn btn-warning btn-sm">
+
+        <i class="bi bi-pencil"></i>
+
+        Editar
+
+    </a>
+
+    {% if user.is_active %}
+
+    <a href="{{ url_for('users.deactivate', user_id=user.id) }}"
+       class="btn btn-danger btn-sm">
+
+        <i class="bi bi-person-x"></i>
+
+        Desactivar
+
+    </a>
+
+    {% else %}
+
+    <a href="{{ url_for('users.activate', user_id=user.id) }}"
+       class="btn btn-success btn-sm">
+
+        <i class="bi bi-person-check"></i>
+
+        Activar
+
+    </a>
+
+    {% endif %}
+
+</td>
 
         {% else %}
 

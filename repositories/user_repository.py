@@ -46,3 +46,17 @@ class UserRepository:
     def count():
         """Return total users."""
         return User.query.count()
+    @staticmethod
+    def deactivate(user):
+
+        user.is_active = False
+
+        db.session.commit()
+
+
+    @staticmethod
+    def activate(user):
+
+        user.is_active = True
+
+        db.session.commit()

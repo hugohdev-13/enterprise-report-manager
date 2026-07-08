@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-warning text-dark">
+            <h3>
+                <i class="bi bi-pencil-square"></i>
+                Editar Usuario
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">Nombre</label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="first_name"
+                            value="{{ user.first_name }}"
+                            required>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">Apellido</label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="last_name"
+                            value="{{ user.last_name }}"
+                            required>
+
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">Correo</label>
+
+                    <input
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        value="{{ user.email }}"
+                        required>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">Rol</label>
+
+                    <select class="form-select" name="role">
+
+                        <option value="Administrator"
+                            {% if user.role == "Administrator" %}selected{% endif %}>
+                            Administrator
+                        </option>
+
+                        <option value="Analyst"
+                            {% if user.role == "Analyst" %}selected{% endif %}>
+                            Analyst
+                        </option>
+
+                        <option value="Viewer"
+                            {% if user.role == "Viewer" %}selected{% endif %}>
+                            Viewer
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button class="btn btn-warning">
+                    <i class="bi bi-save"></i>
+                    Guardar Cambios
+                </button>
+
+                <a href="{{ url_for('users.index') }}"
+                   class="btn btn-secondary">
+
+                    Cancelar
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
