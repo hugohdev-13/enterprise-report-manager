@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from services import ReportService
 
@@ -13,28 +13,114 @@ reports_bp = Blueprint(
 )
 
 
-# Mostrar todos los reportes
 @reports_bp.route("/")
 def list_reports():
-    """Render the report list."""
-    reports = ReportService.get_reports()
+    """Render a searchable, filtered and paginated report list."""
+    search = request.args.get("search", "")
+    report_format = request.args.get("format", "")
+    sort_by = request.args.get("sort_by", "created_at")
+    direction = request.args.get("direction", "desc")
+    page = request.args.get("page", 1, type=int)
+
+    pagination = ReportService.get_paginated_reports(
+        search=search,
+        report_format=report_format,
+        sort_by=sort_by,
+        direction=direction,
+        page=page,
+    )
 
     return render_template(
         "reports.html",
-        reports=reports,
+        reports=pagination.items,
+        pagination=pagination,
+        search=search,
+        selected_format=report_format,
+        sort_by=sort_by,
+        direction=direction,
+        formats=ReportService.ALLOWED_FORMATS,
     )
 
 
-# Crear un nuevo reporte
 @reports_bp.route("/new", methods=["GET", "POST"])
 def new_report():
     """Render the form or create a report from submitted data."""
-    if request.method == "POST":
-        ReportService.create_report(
-            request.form["name"],
-            request.form["format"],
-            str(date.today()),
-        )
-        return redirect("/reports")
+    form_data = {"name": "", "format": "Excel"}
 
-    return render_template("report_form.html")
+    if request.method == "POST":
+        form_data = request.form.to_dict()
+        try:
+            ReportService.create_report(
+                request.form.get("name", ""),
+                request.form.get("format", ""),
+                str(date.today()),
+            )
+        except ValueError as error:
+            flash(str(error), "danger")
+            return render_template(
+                "report_form.html",
+                form_data=form_data,
+                formats=ReportService.ALLOWED_FORMATS,
+                form_title="New Report",
+                submit_label="Create report",
+            ), 400
+
+        flash("Report created successfully", "success")
+        return redirect(url_for("reports.list_reports"))
+
+    return render_template(
+        "report_form.html",
+        form_data=form_data,
+        formats=ReportService.ALLOWED_FORMATS,
+        form_title="New Report",
+        submit_label="Create report",
+    )
+
+
+@reports_bp.route("/<int:report_id>/edit", methods=["GET", "POST"])
+def edit_report(report_id: int):
+    """Render the edit form or update an existing report."""
+    report = ReportService.get_report(report_id)
+    if report is None:
+        flash("Report not found", "warning")
+        return redirect(url_for("reports.list_reports"))
+
+    form_data = {"name": report.name, "format": report.format}
+    if request.method == "POST":
+        form_data = request.form.to_dict()
+        try:
+            ReportService.update_report(
+                report_id,
+                request.form.get("name", ""),
+                request.form.get("format", ""),
+            )
+        except ValueError as error:
+            flash(str(error), "danger")
+            return render_template(
+                "report_form.html",
+                form_data=form_data,
+                formats=ReportService.ALLOWED_FORMATS,
+                form_title="Edit Report",
+                submit_label="Save changes",
+            ), 400
+
+        flash("Report updated successfully", "success")
+        return redirect(url_for("reports.list_reports"))
+
+    return render_template(
+        "report_form.html",
+        form_data=form_data,
+        formats=ReportService.ALLOWED_FORMATS,
+        form_title="Edit Report",
+        submit_label="Save changes",
+    )
+
+
+@reports_bp.route("/<int:report_id>/delete", methods=["POST"])
+def delete_report(report_id: int):
+    """Delete an existing report."""
+    if not ReportService.delete_report(report_id):
+        flash("Report not found", "warning")
+    else:
+        flash("Report deleted successfully", "success")
+    return redirect(url_for("reports.list_reports"))

@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Reports | Enterprise Report Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="page-kicker">Management</span>
+        <h2>Reports</h2>
+        <p>Search, organize and manage enterprise reports.</p>
+    </div>
+    <a href="{{ url_for('reports.new_report') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> New report
+    </a>
+</div>
+
+<div class="card filter-card mb-4">
+    <div class="card-body">
+        <form method="get" id="reportFilters" class="row g-3 align-items-end">
+            <div class="col-12 col-xl-5">
+                <label for="search" class="form-label">Search by name</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input
+                        type="search"
+                        id="search"
+                        name="search"
+                        class="form-control"
+                        value="{{ search }}"
+                        placeholder="Search reports..."
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+            <div class="col-sm-4 col-xl-2">
+                <label for="formatFilter" class="form-label">Format</label>
+                <select id="formatFilter" name="format" class="form-select">
+                    <option value="">All</option>
+                    {% for report_format in formats %}
+                        <option
+                            value="{{ report_format }}"
+                            {{ 'selected' if selected_format == report_format else '' }}
+                        >
+                            {{ report_format }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-4 col-xl-2">
+                <label for="sortBy" class="form-label">Sort by</label>
+                <select id="sortBy" name="sort_by" class="form-select">
+                    <option value="name" {{ 'selected' if sort_by == 'name' else '' }}>Name</option>
+                    <option value="created_at" {{ 'selected' if sort_by == 'created_at' else '' }}>Date</option>
+                    <option value="format" {{ 'selected' if sort_by == 'format' else '' }}>Format</option>
+                </select>
+            </div>
+            <div class="col-sm-4 col-xl-2">
+                <label for="direction" class="form-label">Direction</label>
+                <select id="direction" name="direction" class="form-select">
+                    <option value="asc" {{ 'selected' if direction == 'asc' else '' }}>Ascending</option>
+                    <option value="desc" {{ 'selected' if direction == 'desc' else '' }}>Descending</option>
+                </select>
+            </div>
+            <div class="col-12 col-xl-1 d-grid">
+                <button class="btn btn-dark" type="submit" title="Apply filters">
+                    <i class="bi bi-funnel"></i>
+                    <span class="d-xl-none ms-1">Apply</span>
+                </button>
+            </div>
+        </form>
+
+        {% if search or selected_format %}
+            <div class="filter-summary mt-3">
+                <span><i class="bi bi-filter-circle me-1"></i> Active filters</span>
+                <a href="{{ url_for('reports.list_reports') }}">Clear all</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card table-card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="h6 mb-1">Report directory</h3>
+            <span class="text-secondary small">{{ pagination.total }} result(s)</span>
+        </div>
+        <span class="badge text-bg-light border">Page {{ pagination.page }} of {{ pagination.pages or 1 }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Format</th>
+                    <th scope="col">Created</th>
+                    <th scope="col" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    <tr>
+                        <td><span class="report-id">#{{ report.id }}</span></td>
+                        <td>
+                            <div class="report-name">
+                                <span class="file-icon"><i class="bi bi-file-earmark-text"></i></span>
+                                <strong>{{ report.name }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="format-badge format-{{ report.format|lower }}">
+                                {{ report.format }}
+                            </span>
+                        </td>
+                        <td>{{ report.created_at }}</td>
+                        <td class="text-end text-nowrap">
+                            <a
+                                href="{{ url_for('reports.edit_report', report_id=report.id) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                title="Edit report"
+                            >
+                                <i class="bi bi-pencil-square"></i>
+                                <span class="d-none d-lg-inline ms-1">Edit</span>
+                            </a>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger delete-report-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteReportModal"
+                                data-report-name="{{ report.name }}"
+                                data-delete-url="{{ url_for('reports.delete_report', report_id=report.id) }}"
+                                title="Delete report"
+                            >
+                                <i class="bi bi-trash3"></i>
+                                <span class="d-none d-lg-inline ms-1">Delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <h3>No reports found</h3>
+                                <p>Try changing the search criteria or create a new report.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.pages > 1 %}
+        <div class="card-footer bg-white">
+            <nav aria-label="Report pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
+                        <a
+                            class="page-link"
+                            href="{{ url_for('reports.list_reports', page=pagination.prev_num, search=search, format=selected_format, sort_by=sort_by, direction=direction) if pagination.has_prev else '#' }}"
+                        >Previous</a>
+                    </li>
+                    {% for page_number in pagination.iter_pages() %}
+                        {% if page_number %}
+                            <li class="page-item {{ 'active' if page_number == pagination.page else '' }}">
+                                <a
+                                    class="page-link"
+                                    href="{{ url_for('reports.list_reports', page=page_number, search=search, format=selected_format, sort_by=sort_by, direction=direction) }}"
+                                >{{ page_number }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {{ 'disabled' if not pagination.has_next else '' }}">
+                        <a
+                            class="page-link"
+                            href="{{ url_for('reports.list_reports', page=pagination.next_num, search=search, format=selected_format, sort_by=sort_by, direction=direction) if pagination.has_next else '#' }}"
+                        >Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="deleteReportModal" tabindex="-1" aria-labelledby="deleteReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h2 class="modal-title fs-5" id="deleteReportModalLabel">Delete report</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="modal-warning-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                <p class="mb-1 text-center">Are you sure you want to delete</p>
+                <p class="fw-semibold text-center mb-0" id="deleteReportName"></p>
+                <p class="text-secondary small text-center mt-3 mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" id="deleteReportForm">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash3 me-1"></i> Delete report
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const filterForm = document.getElementById("reportFilters");
+    const searchInput = document.getElementById("search");
+    let searchTimer;
+
+    searchInput.addEventListener("input", () => {
+        window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(() => filterForm.submit(), 450);
+    });
+
+    ["formatFilter", "sortBy", "direction"].forEach((id) => {
+        document.getElementById(id).addEventListener("change", () => filterForm.submit());
+    });
+
+    document.querySelectorAll(".delete-report-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            document.getElementById("deleteReportName").textContent = button.dataset.reportName;
+            document.getElementById("deleteReportForm").action = button.dataset.deleteUrl;
+        });
+    });
+</script>
+{% endblock %}
