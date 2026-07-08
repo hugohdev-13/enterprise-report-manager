@@ -2,8 +2,90 @@
 
 {% block content %}
 
-<h1>Enterprise Report Manager</h1>
+<h2 class="mb-4">Dashboard</h2>
 
-<p>Bienvenido al Dashboard.</p>
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5>📊 Reportes</h5>
+                <h2>258</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5>👥 Usuarios</h5>
+                <h2>35</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5>📤 Exportaciones</h5>
+                <h2>148</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5>🗄️ Bases de datos</h5>
+                <h2>4</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr class="my-5">
+
+<h3>Últimos Reportes</h3>
+
+<table class="table table-striped table-hover">
+
+<thead>
+
+<tr>
+
+<th>Nombre</th>
+
+<th>Formato</th>
+
+<th>Fecha</th>
+
+<th>Acción</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>Reporte Ventas</td>
+
+<td>Excel</td>
+
+<td>07/07/2026</td>
+
+<td>
+<button class="btn btn-primary btn-sm">
+Descargar
+</button>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 {% endblock %}
