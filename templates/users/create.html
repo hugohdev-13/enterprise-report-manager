@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+<div class="card shadow">
+
+<div class="card-header">
+
+<h3>
+
+Nuevo Usuario
+
+</h3>
+
+</div>
+
+<div class="card-body">
+
+<form method="POST">
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+
+<label>
+
+Nombre
+
+</label>
+
+<input
+class="form-control"
+name="first_name"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>
+
+Apellido
+
+</label>
+
+<input
+class="form-control"
+name="last_name"
+required>
+
+</div>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Correo
+
+</label>
+
+<input
+type="email"
+class="form-control"
+name="email"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Contraseña
+
+</label>
+
+<input
+type="password"
+class="form-control"
+name="password"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Rol
+
+</label>
+
+<select
+class="form-select"
+name="role">
+
+<option>Administrator</option>
+
+<option>Analyst</option>
+
+<option>Viewer</option>
+
+</select>
+
+</div>
+
+<button
+class="btn btn-success">
+
+Guardar
+
+</button>
+
+<a
+href="/users"
+class="btn btn-secondary">
+
+Cancelar
+
+</a>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

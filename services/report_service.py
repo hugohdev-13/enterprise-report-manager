@@ -5,7 +5,43 @@ from typing import Any
 from models import Report
 from repositories import ReportRepository
 
+from collections import Counter
 
+class ReportService:
+
+    ...
+
+    @staticmethod
+    def dashboard_metrics():
+
+        reports = ReportService.get_reports()
+
+        formats = Counter()
+
+        for report in reports:
+            formats[report.format] += 1
+
+        return {
+            "total": len(reports),
+
+            "by_format": {
+                "Excel": formats.get("Excel", 0),
+                "PDF": formats.get("PDF", 0),
+                "CSV": formats.get("CSV", 0),
+            },
+
+            "chart_labels": [
+                "Excel",
+                "PDF",
+                "CSV"
+            ],
+
+            "chart_values": [
+                formats.get("Excel", 0),
+                formats.get("PDF", 0),
+                formats.get("CSV", 0),
+            ]
+        }
 class ReportService:
     """Coordinate report use cases and persistence operations."""
 
