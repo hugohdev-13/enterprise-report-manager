@@ -1,55 +1,143 @@
-{% extends "base.html" %}
+{% extends "layouts/auth.html" %}
+
+{% block title %}Iniciar sesión{% endblock %}
 
 {% block content %}
 
-<div class="row justify-content-center mt-5">
+<div class="container-fluid login-wrapper">
 
-    <div class="col-md-5">
+    <div class="row w-100 align-items-center">
 
-        <div class="card shadow">
+        <!-- Panel izquierdo -->
 
-            <div class="card-body">
+        <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center text-white px-5">
 
-                <h2 class="text-center mb-4">
+            <i class="bi bi-bar-chart-fill login-logo"></i>
 
-                    Iniciar Sesión
+            <h1 class="display-4 fw-bold mt-4">
 
-                </h2>
+                Enterprise Report Manager
+
+            </h1>
+
+            <p class="fs-5 opacity-75">
+
+                Plataforma empresarial para la administración,
+                automatización y análisis de reportes.
+
+            </p>
+
+            <div class="mt-5">
+
+                <p><i class="bi bi-check-circle-fill text-success me-2"></i>Dashboard Ejecutivo</p>
+
+                <p><i class="bi bi-check-circle-fill text-success me-2"></i>Gestión de Usuarios</p>
+
+                <p><i class="bi bi-check-circle-fill text-success me-2"></i>Reportes Inteligentes</p>
+
+                <p><i class="bi bi-check-circle-fill text-success me-2"></i>Exportación Excel / PDF</p>
+
+                <p><i class="bi bi-check-circle-fill text-success me-2"></i>Automatización de Procesos</p>
+
+            </div>
+
+        </div>
+
+        <!-- Panel derecho -->
+
+        <div class="col-lg-6 d-flex justify-content-center">
+
+            <div class="login-card">
+
+                <div class="text-center mb-4">
+
+                    <h2 class="login-title">
+
+                        Bienvenido 👋
+
+                    </h2>
+
+                    <p class="login-subtitle">
+
+                        Inicia sesión para continuar
+
+                    </p>
+
+                </div>
 
                 <form method="POST">
 
                     <div class="mb-3">
 
-                        <label>Email</label>
+                        <label class="form-label text-white">
+
+                            Correo electrónico
+
+                        </label>
 
                         <input
                             type="email"
                             class="form-control"
                             name="email"
+                            placeholder="usuario@empresa.com"
                             required>
 
                     </div>
 
                     <div class="mb-3">
 
-                        <label>Contraseña</label>
+                        <label class="form-label text-white">
+
+                            Contraseña
+
+                        </label>
 
                         <input
                             type="password"
                             class="form-control"
                             name="password"
+                            placeholder="********"
                             required>
 
                     </div>
 
-                    <button
-                        class="btn btn-primary w-100">
+                    <div class="form-check mb-4">
 
-                        Iniciar Sesión
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="remember">
+
+                        <label
+                            class="form-check-label text-white"
+                            for="remember">
+
+                            Recordarme
+
+                        </label>
+
+                    </div>
+
+                    <button
+                        class="btn btn-primary login-btn w-100">
+
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                        Iniciar sesión
 
                     </button>
 
                 </form>
+
+                <div class="text-center mt-4">
+
+                    <small class="text-white-50">
+
+                        Enterprise Report Manager © 2026
+
+                    </small>
+
+                </div>
 
             </div>
 

@@ -1,3 +1,8 @@
+from flask_login import logout_user
+from flask_login import login_required
+
+
+
 """Authentication routes."""
 
 from flask import (
@@ -57,14 +62,17 @@ def login():
     return render_template("auth/login.html")
 
 
+
+
 @auth_bp.route("/logout")
+@login_required
 def logout():
 
     logout_user()
 
     flash(
-        "Sesión cerrada correctamente.",
-        "info"
+        "Has cerrado sesión correctamente.",
+        "success"
     )
 
     return redirect(url_for("auth.login"))
