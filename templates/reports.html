@@ -212,25 +212,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    const filterForm = document.getElementById("reportFilters");
-    const searchInput = document.getElementById("search");
-    let searchTimer;
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
 
-    searchInput.addEventListener("input", () => {
-        window.clearTimeout(searchTimer);
-        searchTimer = window.setTimeout(() => filterForm.submit(), 450);
-    });
-
-    ["formatFilter", "sortBy", "direction"].forEach((id) => {
-        document.getElementById(id).addEventListener("change", () => filterForm.submit());
-    });
-
-    document.querySelectorAll(".delete-report-button").forEach((button) => {
-        button.addEventListener("click", () => {
-            document.getElementById("deleteReportName").textContent = button.dataset.reportName;
-            document.getElementById("deleteReportForm").action = button.dataset.deleteUrl;
-        });
-    });
-</script>
 {% endblock %}

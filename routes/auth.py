@@ -1,8 +1,3 @@
-from flask_login import logout_user
-from flask_login import login_required
-
-
-
 """Authentication routes."""
 
 from flask import (
@@ -17,10 +12,13 @@ from flask import (
 from flask_login import (
     login_user,
     logout_user,
-    current_user
+    current_user,
+    login_required
 )
 
 from services.user_service import UserService
+from services.activity_service import ActivityService
+
 
 auth_bp = Blueprint(
     "auth",
@@ -31,14 +29,12 @@ auth_bp = Blueprint(
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
 
-    # Si el usuario ya inició sesión
     if current_user.is_authenticated:
         return redirect(url_for("home.index"))
 
     if request.method == "POST":
 
         email = request.form["email"]
-
         password = request.form["password"]
 
         user = UserService.authenticate(email, password)
@@ -46,6 +42,12 @@ def login():
         if user:
 
             login_user(user)
+
+            ActivityService.log(
+                action="LOGIN",
+                description="Inicio de sesión exitoso",
+                user=f"{user.first_name} {user.last_name}"
+            )
 
             flash(
                 "Bienvenido al sistema.",
@@ -62,17 +64,21 @@ def login():
     return render_template("auth/login.html")
 
 
-
-
 @auth_bp.route("/logout")
 @login_required
 def logout():
 
+    ActivityService.log(
+        action="LOGOUT",
+        description="Cierre de sesión",
+        user=f"{current_user.first_name} {current_user.last_name}"
+    )
+
     logout_user()
 
     flash(
-        "Has cerrado sesión correctamente.",
-        "success"
+        "Sesión cerrada correctamente.",
+        "info"
     )
 
     return redirect(url_for("auth.login"))

@@ -1,9 +1,12 @@
 """Dashboard routes."""
 
+from datetime import datetime
+
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-from services import ReportService
+from services.dashboard_service import DashboardService
+
 
 home = Blueprint("home", __name__)
 
@@ -12,12 +15,10 @@ home = Blueprint("home", __name__)
 @login_required
 def index():
 
-    reports = ReportService.get_reports()
-
-    metrics = ReportService.get_dashboard_metrics()
+    dashboard = DashboardService.get_dashboard()
 
     return render_template(
-        "dashboard.html",
-        reports=reports,
-        metrics=metrics
+        "dashboard/index.html",
+        dashboard=dashboard,
+        today=datetime.now()
     )

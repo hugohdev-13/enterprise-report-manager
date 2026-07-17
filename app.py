@@ -18,6 +18,15 @@ from routes.users import users_bp
 
 # Services
 from services.user_service import UserService
+# Activity Activity 
+from routes.activity import activity_bp
+
+from datetime import datetime
+from services.activity_service import ActivityService
+from routes.profile import profile_bp
+from flask import render_template
+
+
 
 
 app = Flask(__name__)
@@ -26,6 +35,24 @@ app = Flask(__name__)
 # CONFIGURATION
 # ==========================================
 
+@app.context_processor
+def inject_globals():
+
+    return {
+
+        "today": datetime.now(),
+
+        "notifications": ActivityService.get_notifications(5)
+
+    }
+@app.context_processor
+def inject_globals():
+
+    return {
+        "today": datetime.now()
+    }
+
+app.register_blueprint(activity_bp)
 app.config["SECRET_KEY"] = os.getenv(
     "SECRET_KEY",
     "development-secret-key"
@@ -33,7 +60,28 @@ app.config["SECRET_KEY"] = os.getenv(
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///enterprise.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+@app.errorhandler(403)
+def forbidden(error):
 
+    return render_template(
+        "errors/403.html"
+    ), 403
+
+
+@app.errorhandler(404)
+def not_found(error):
+
+    return render_template(
+        "errors/404.html"
+    ), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+
+    return render_template(
+        "errors/500.html"
+    ), 500
 # ==========================================
 # DATABASE
 # ==========================================
@@ -71,6 +119,9 @@ app.register_blueprint(home)
 app.register_blueprint(reports_bp)
 
 app.register_blueprint(users_bp)
+app.register_blueprint(profile_bp)
+
+
 
 # ==========================================
 # DATABASE INITIALIZATION

@@ -5,6 +5,8 @@ from datetime import date
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from services import ReportService
+from flask_login import login_required, current_user
+from services.activity_service import ActivityService
 
 reports_bp = Blueprint(
     "reports",
@@ -50,10 +52,16 @@ def new_report():
     if request.method == "POST":
         form_data = request.form.to_dict()
         try:
-            ReportService.create_report(
+            report = ReportService.create_report(
                 request.form.get("name", ""),
                 request.form.get("format", ""),
                 str(date.today()),
+            )
+
+            ActivityService.log(
+                action="CREATE_REPORT",
+                description=f"Se creó el reporte '{report.name}'",
+                user=current_user.email
             )
         except ValueError as error:
             flash(str(error), "danger")
@@ -89,11 +97,17 @@ def edit_report(report_id: int):
     if request.method == "POST":
         form_data = request.form.to_dict()
         try:
-            ReportService.update_report(
-                report_id,
-                request.form.get("name", ""),
-                request.form.get("format", ""),
-            )
+            report = ReportService.update_report(
+            report_id,
+            request.form.get("name", ""),
+            request.form.get("format", ""),
+        )
+
+            ActivityService.log(
+            action="UPDATE_REPORT",
+            description=f"Se actualizó el reporte '{report.name}'",
+            user=current_user.email
+        )
         except ValueError as error:
             flash(str(error), "danger")
             return render_template(
@@ -117,10 +131,28 @@ def edit_report(report_id: int):
 
 
 @reports_bp.route("/<int:report_id>/delete", methods=["POST"])
-def delete_report(report_id: int):
-    """Delete an existing report."""
-    if not ReportService.delete_report(report_id):
-        flash("Report not found", "warning")
-    else:
-        flash("Report deleted successfully", "success")
+@login_required
+def delete_report(report_id):
+
+    report = ReportService.get_report(report_id)
+
+    if report is None:
+
+        flash("Reporte no encontrado.", "warning")
+
+        return redirect(url_for("reports.list_reports"))
+
+    ActivityService.log(
+        action="DELETE_REPORT",
+        description=f"Se eliminó el reporte '{report.name}'",
+        user=current_user.email
+    )
+
+    ReportService.delete_report(report_id)
+
+    flash(
+        "Reporte eliminado correctamente.",
+        "success"
+    )
+
     return redirect(url_for("reports.list_reports"))

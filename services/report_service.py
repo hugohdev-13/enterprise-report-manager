@@ -5,45 +5,9 @@ from typing import Any
 from models import Report
 from repositories import ReportRepository
 
-from collections import Counter
 
 class ReportService:
-
-    ...
-
-    @staticmethod
-    def dashboard_metrics():
-
-        reports = ReportService.get_reports()
-
-        formats = Counter()
-
-        for report in reports:
-            formats[report.format] += 1
-
-        return {
-            "total": len(reports),
-
-            "by_format": {
-                "Excel": formats.get("Excel", 0),
-                "PDF": formats.get("PDF", 0),
-                "CSV": formats.get("CSV", 0),
-            },
-
-            "chart_labels": [
-                "Excel",
-                "PDF",
-                "CSV"
-            ],
-
-            "chart_values": [
-                formats.get("Excel", 0),
-                formats.get("PDF", 0),
-                formats.get("CSV", 0),
-            ]
-        }
-class ReportService:
-    """Coordinate report use cases and persistence operations."""
+    """Business logic for report management."""
 
     ALLOWED_FORMATS = ("Excel", "PDF", "CSV")
     ALLOWED_SORT_FIELDS = ("name", "created_at", "format")
@@ -57,7 +21,7 @@ class ReportService:
 
     @staticmethod
     def get_recent_reports(limit: int = 5) -> list[Report]:
-        """Return the newest reports for dashboard display."""
+        """Return the most recent reports."""
         return ReportRepository.get_recent(limit)
 
     @classmethod
@@ -69,16 +33,26 @@ class ReportService:
         direction: str = "desc",
         page: int = 1,
     ) -> Any:
-        """Return validated report listing parameters and page data."""
+        """Return paginated reports."""
+
         normalized_search = search.strip()
+
         normalized_format = (
-            report_format if report_format in cls.ALLOWED_FORMATS else ""
+            report_format
+            if report_format in cls.ALLOWED_FORMATS
+            else ""
         )
+
         normalized_sort = (
-            sort_by if sort_by in cls.ALLOWED_SORT_FIELDS else "created_at"
+            sort_by
+            if sort_by in cls.ALLOWED_SORT_FIELDS
+            else "created_at"
         )
+
         normalized_direction = (
-            direction if direction in cls.ALLOWED_DIRECTIONS else "desc"
+            direction
+            if direction in cls.ALLOWED_DIRECTIONS
+            else "desc"
         )
 
         return ReportRepository.get_paginated(
@@ -92,7 +66,7 @@ class ReportService:
 
     @staticmethod
     def get_report(report_id: int) -> Report | None:
-        """Return a report by identifier."""
+        """Return a report by id."""
         return ReportRepository.get_by_id(report_id)
 
     @classmethod
@@ -102,16 +76,19 @@ class ReportService:
         report_format: str,
         created_at: str,
     ) -> Report:
-        """Validate, create and persist a report."""
+        """Create a report."""
+
         normalized_name, normalized_format = cls._validate_report(
             name,
             report_format,
         )
+
         report = Report(
             name=normalized_name,
             format=normalized_format,
             created_at=created_at,
         )
+
         return ReportRepository.create(report)
 
     @classmethod
@@ -121,48 +98,69 @@ class ReportService:
         name: str,
         report_format: str,
     ) -> Report | None:
-        """Validate and update a report when it exists."""
+        """Update a report."""
+
         normalized_name, normalized_format = cls._validate_report(
             name,
             report_format,
         )
+
         report = ReportRepository.get_by_id(report_id)
+
         if report is None:
             return None
 
         report.name = normalized_name
         report.format = normalized_format
+
         ReportRepository.update()
+
         return report
 
     @staticmethod
     def delete_report(report_id: int) -> bool:
-        """Delete a report when it exists."""
+        """Delete a report."""
+
         report = ReportRepository.get_by_id(report_id)
+
         if report is None:
             return False
 
         ReportRepository.delete(report)
+
         return True
 
     @staticmethod
     def total_reports() -> int:
-        """Return the total number of reports."""
+        """Return total reports."""
         return ReportRepository.count()
 
     @classmethod
     def get_dashboard_metrics(cls) -> dict[str, Any]:
-        """Return report totals and chart data for the dashboard."""
-        totals_by_format = ReportRepository.count_by_format()
-        format_totals = {
-            report_format: totals_by_format.get(report_format, 0)
-            for report_format in cls.ALLOWED_FORMATS
-        }
+        """Return dashboard metrics."""
+
+        totals = ReportRepository.count_by_format()
+
         return {
-            "total": ReportRepository.count(),
-            "by_format": format_totals,
-            "chart_labels": list(format_totals.keys()),
-            "chart_values": list(format_totals.values()),
+            "total_reports": ReportRepository.count(),
+
+            "excel_reports": totals.get("Excel", 0),
+
+            "pdf_reports": totals.get("PDF", 0),
+
+            "csv_reports": totals.get("CSV", 0),
+
+            "chart_labels": [
+                "Excel",
+                "PDF",
+                "CSV",
+            ],
+
+            "chart_values": [
+                totals.get("Excel", 0),
+                totals.get("PDF", 0),
+                totals.get("CSV", 0),
+            ],
         }
 
     @classmethod
@@ -171,12 +169,21 @@ class ReportService:
         name: str,
         report_format: str,
     ) -> tuple[str, str]:
-        """Validate and normalize report input values."""
+        """Validate report information."""
+
         normalized_name = name.strip()
+
         if not normalized_name:
-            raise ValueError("Report name is required.")
+            raise ValueError("El nombre del reporte es obligatorio.")
+
         if len(normalized_name) > 100:
-            raise ValueError("Report name must not exceed 100 characters.")
+            raise ValueError(
+                "El nombre del reporte no puede exceder los 100 caracteres."
+            )
+
         if report_format not in cls.ALLOWED_FORMATS:
-            raise ValueError("Select a valid report format.")
+            raise ValueError(
+                "Selecciona un formato válido."
+            )
+
         return normalized_name, report_format

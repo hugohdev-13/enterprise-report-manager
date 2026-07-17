@@ -48,7 +48,13 @@
                 <h3 class="h6 mb-1">Reports by format</h3>
                 <span class="text-secondary small">Current distribution in SQLite</span>
             </div>
-            <div class="card-body"><canvas id="reportsByFormatChart"></canvas></div>
+            <div class="card-body">
+                <canvas
+                    id="reportsByFormatChart"
+                    data-chart-labels="{{ metrics.chart_labels|tojson|forceescape }}"
+                    data-chart-values="{{ metrics.chart_values|tojson|forceescape }}"
+                ></canvas>
+            </div>
         </div>
     </div>
     <div class="col-xl-5">
@@ -86,28 +92,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    new Chart(document.getElementById("reportsByFormatChart"), {
-        type: "bar",
-        data: {
-            labels: {{ metrics.chart_labels | tojson }},
-            datasets: [{
-                label: "Reports",
-                data: {{ metrics.chart_values | tojson }},
-                backgroundColor: ["#22c55e", "#ef4444", "#3b82f6"],
-                borderRadius: 8,
-                borderSkipped: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#eef2f7" } },
-                x: { grid: { display: false } }
-            }
-        }
-    });
-</script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 {% endblock %}

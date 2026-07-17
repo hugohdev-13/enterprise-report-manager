@@ -1,6 +1,11 @@
 """Application database models."""
-from .report import Report
+
 from .user import User
 from .report import Report
+from .activity import Activity
 
-__all__ = ["Report"]
+__all__ = [
+    "User",
+    "Report",
+    "Activity",
+]

@@ -1,47 +1,8 @@
 /* ==========================================
-   VARIABLES GLOBALES
-========================================== */
-
-:root{
-
-    --primary:#2563EB;
-    --primary-dark:#1D4ED8;
-
-    --secondary:#1E293B;
-
-    --background:#F8FAFC;
-
-    --surface:#FFFFFF;
-
-    --border:#E2E8F0;
-
-    --text:#0F172A;
-
-    --text-light:#64748B;
-
-    --success:#22C55E;
-
-    --warning:#F59E0B;
-
-    --danger:#EF4444;
-
-    --radius:16px;
-
-    --shadow:
-
-        0 8px 24px rgba(15,23,42,.08);
-
-    --transition:.25s ease;
-
-    --sidebar-width:270px;
-
-}
-
-/* ==========================================
    RESET
 ========================================== */
 
-*{
+* {
 
     margin:0;
 
@@ -51,13 +12,13 @@
 
 }
 
-html{
+html {
 
     scroll-behavior:smooth;
 
 }
 
-body{
+body {
 
     background:var(--background);
 

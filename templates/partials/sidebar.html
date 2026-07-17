@@ -1,41 +1,87 @@
-<aside class="sidebar">
-    <a class="brand" href="{{ url_for('home.index') }}">
-        <span class="brand-icon"><i class="bi bi-bar-chart-line-fill"></i></span>
-        <span>
+<aside class="enterprise-sidebar">
+    <a class="sidebar-brand" href="{{ url_for('home.index') }}" aria-label="Enterprise Report Manager">
+        <span class="sidebar-brand-icon">
+            <i class="bi bi-bar-chart-line-fill"></i>
+        </span>
+        <span class="sidebar-brand-text">
             <strong>Enterprise</strong>
             <small>Report Manager</small>
         </span>
     </a>
 
-    <nav class="sidebar-nav" aria-label="Main navigation">
-        <span class="nav-label">Workspace</span>
-        <a
-            href="{{ url_for('home.index') }}"
-            class="{{ 'active' if request.endpoint == 'home.index' else '' }}"
-        >
-            <i class="bi bi-grid-1x2-fill"></i>
-            Dashboard
-        </a>
-        <a
-            href="{{ url_for('reports.list_reports') }}"
-            class="{{ 'active' if request.blueprint == 'reports' else '' }}"
-        >
-            <i class="bi bi-file-earmark-text-fill"></i>
-            Reportes
-        </a>
+    <nav class="sidebar-nav" aria-label="Navegacion principal">
+        <div class="sidebar-section">
+            <span class="sidebar-label">Workspace</span>
 
-        <span class="nav-label mt-4">Administración</span>
-        {% if current_user.role=="Administrator" %}
+            <a
+                href="{{ url_for('home.index') }}"
+                class="sidebar-link {{ 'active' if request.endpoint == 'home.index' else '' }}"
+            >
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
 
-        <a href="/users">
+            <a
+                href="{{ url_for('reports.list_reports') }}"
+                class="sidebar-link {{ 'active' if request.blueprint == 'reports' else '' }}"
+            >
+                <i class="bi bi-file-earmark-text-fill"></i>
+                <span>Reportes</span>
+            </a>
+        </div>
 
-        Usuarios
+        {% if current_user.role == "Administrator" %}
+            <div class="sidebar-section">
+                <span class="sidebar-label">Administracion</span>
 
-        </a>
+                <a
+                    href="{{ url_for('users.index') }}"
+                    class="sidebar-link {{ 'active' if request.blueprint == 'users' else '' }}"
+                >
+                    <i class="bi bi-people-fill"></i>
+                    <span>Usuarios</span>
+                </a>
 
-        {% endif %}  
-        </a>
-        <a href="#"><i class="bi bi-box-arrow-up-right"></i> Exportar</a>
-        <a href="#"><i class="bi bi-gear-fill"></i> Configuración</a>
+                <a
+                    href="{{ url_for('activity.index') }}"
+                    class="sidebar-link {{ 'active' if request.blueprint == 'activity' else '' }}"
+                >
+                    <i class="bi bi-clock-history"></i>
+                    <span>Actividad</span>
+                </a>
+            </div>
+        {% endif %}
+
+        <div class="sidebar-section">
+            <span class="sidebar-label">Herramientas</span>
+
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-box-arrow-up-right"></i>
+                <span>Exportar</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-gear-fill"></i>
+                <span>Configuracion</span>
+            </a>
+
+            <a
+                href="{{ url_for('profile.index') }}"
+                class="sidebar-link {{ 'active' if request.blueprint == 'profile' else '' }}"
+            >
+                <i class="bi bi-person-circle"></i>
+                <span>Mi Perfil</span>
+            </a>
+        </div>
     </nav>
+
+    <div class="sidebar-footer">
+        <span class="sidebar-user-avatar">
+            {{ current_user.first_name[:1] }}{{ current_user.last_name[:1] }}
+        </span>
+        <span class="sidebar-user-meta">
+            <strong>{{ current_user.first_name }}</strong>
+            <small>{{ current_user.role }}</small>
+        </span>
+    </div>
 </aside>

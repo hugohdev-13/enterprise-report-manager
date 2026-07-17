@@ -1,0 +1,46 @@
+/* ==========================================
+   ENTERPRISE DESIGN SYSTEM TOKENS
+========================================== */
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #dbeafe;
+
+    --success: #22c55e;
+    --success-dark: #16a34a;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --info: #0ea5e9;
+
+    --sidebar: #1e293b;
+    --sidebar-hover: #334155;
+    --sidebar-active: #2563eb;
+    --sidebar-text: #e2e8f0;
+    --sidebar-muted: #94a3b8;
+
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --border: #e2e8f0;
+
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+    --text-inverse: #ffffff;
+
+    --radius-sm: 10px;
+    --radius: 16px;
+    --radius-lg: 24px;
+
+    --shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.06);
+    --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 24px 48px rgba(15, 23, 42, 0.14);
+    --shadow-primary: 0 6px 15px rgba(37, 99, 235, 0.35);
+
+    --transition: 0.25s ease;
+    --sidebar-width: 270px;
+    --sidebar-collapsed-width: 80px;
+}

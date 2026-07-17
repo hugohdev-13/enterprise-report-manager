@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Enterprise Report Manager{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="dashboard-hero">
+        <div>
+            <span class="page-kicker">Enterprise Overview</span>
+            <h1>Bienvenido, {{ current_user.first_name }}</h1>
+            <p>Resumen ejecutivo del sistema, reportes, usuarios y actividad reciente.</p>
+        </div>
+
+        <div class="dashboard-hero-actions">
+            <div class="dashboard-date">
+                <i class="bi bi-calendar3"></i>
+                <span>{{ today.strftime("%d/%m/%Y") }}</span>
+            </div>
+            <a href="{{ url_for('reports.new_report') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>
+                Nuevo Reporte
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <article class="enterprise-kpi kpi-primary reveal-card">
+                <div class="kpi-content">
+                    <span>Usuarios</span>
+                    <strong class="counter" data-target="{{ dashboard.total_users }}">0</strong>
+                    <small>Usuarios registrados</small>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <article class="enterprise-kpi kpi-success reveal-card">
+                <div class="kpi-content">
+                    <span>Reportes</span>
+                    <strong class="counter" data-target="{{ dashboard.total_reports }}">0</strong>
+                    <small>Total disponible</small>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <article class="enterprise-kpi kpi-warning reveal-card">
+                <div class="kpi-content">
+                    <span>Excel</span>
+                    <strong class="counter" data-target="{{ dashboard.excel_reports }}">0</strong>
+                    <small>Reportes Excel</small>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-file-earmark-excel-fill"></i>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <article class="enterprise-kpi kpi-danger reveal-card">
+                <div class="kpi-content">
+                    <span>PDF</span>
+                    <strong class="counter" data-target="{{ dashboard.pdf_reports }}">0</strong>
+                    <small>Reportes PDF</small>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-8">
+            <section class="enterprise-card chart-panel reveal-card">
+                <div class="enterprise-card-header">
+                    <div>
+                        <span class="section-kicker">Analytics</span>
+                        <h2>Reportes por formato</h2>
+                    </div>
+                    <span class="status-pill">
+                        <i class="bi bi-database-check"></i>
+                        SQLite Live
+                    </span>
+                </div>
+
+                <div class="chart-container enterprise-chart-container">
+                    <canvas
+                        id="reportsChart"
+                        data-chart-labels="{{ dashboard.chart_labels|tojson|forceescape }}"
+                        data-chart-values="{{ dashboard.chart_values|tojson|forceescape }}"
+                    ></canvas>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-xl-4">
+            <section class="enterprise-card activity-panel reveal-card">
+                <div class="enterprise-card-header">
+                    <div>
+                        <span class="section-kicker">Activity</span>
+                        <h2>Actividad reciente</h2>
+                    </div>
+                    <i class="bi bi-clock-history header-icon"></i>
+                </div>
+
+                <div class="activity-timeline">
+                    {% for activity in dashboard.recent_activities %}
+                        <article class="activity-item-enterprise">
+                            <div class="activity-dot">
+                                <i class="bi bi-activity"></i>
+                            </div>
+                            <div>
+                                <span class="activity-action">{{ activity.action }}</span>
+                                <p>{{ activity.description }}</p>
+                                <small>
+                                    {{ activity.user }} - {{ activity.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                </small>
+                            </div>
+                        </article>
+                    {% else %}
+                        <div class="empty-state compact">
+                            <i class="bi bi-bell-slash"></i>
+                            <p>No hay actividad registrada.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <section class="enterprise-card reveal-card">
+                <div class="enterprise-card-header">
+                    <div>
+                        <span class="section-kicker">Reports</span>
+                        <h2>Ultimos reportes</h2>
+                    </div>
+                    <a href="{{ url_for('reports.list_reports') }}" class="btn btn-sm btn-light">
+                        Ver todos
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table enterprise-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Formato</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in dashboard.recent_reports %}
+                                <tr>
+                                    <td>
+                                        <div class="report-cell">
+                                            <span class="report-icon"><i class="bi bi-file-earmark-text"></i></span>
+                                            <strong>{{ report.name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="format-badge format-{{ report.format|lower }}">
+                                            {{ report.format }}
+                                        </span>
+                                    </td>
+                                    <td>{{ report.created_at }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="empty-state compact">
+                                            <i class="bi bi-inbox"></i>
+                                            <p>No existen reportes registrados.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-xl-4">
+            <section class="enterprise-card quick-actions-panel reveal-card">
+                <div class="enterprise-card-header">
+                    <div>
+                        <span class="section-kicker">Shortcuts</span>
+                        <h2>Acciones rapidas</h2>
+                    </div>
+                    <i class="bi bi-lightning-charge-fill header-icon"></i>
+                </div>
+
+                <div class="quick-action-grid">
+                    <a href="{{ url_for('reports.new_report') }}" class="quick-action">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Nuevo Reporte</span>
+                    </a>
+                    <a href="{{ url_for('reports.list_reports') }}" class="quick-action">
+                        <i class="bi bi-folder2-open"></i>
+                        <span>Ver Reportes</span>
+                    </a>
+                    <a href="{{ url_for('users.create') }}" class="quick-action">
+                        <i class="bi bi-person-plus"></i>
+                        <span>Nuevo Usuario</span>
+                    </a>
+                    <a href="{{ url_for('activity.index') }}" class="quick-action">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Actividad</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

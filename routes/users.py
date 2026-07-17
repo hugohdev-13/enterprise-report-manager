@@ -1,7 +1,12 @@
 from flask import Blueprint, render_template
+from models import user
 from services.user_service import UserService
+from services.activity_service import ActivityService
 from flask import request, redirect, flash
-from flask_login import login_required
+from flask_login import (
+    login_required,
+    current_user
+)
 from utils.decorators import role_required
 
 
@@ -31,13 +36,18 @@ def index():
 def create():
 
     if request.method == "POST":
-
-        UserService.create_user(
+        new_user = UserService.create_user(
             first_name=request.form["first_name"],
             last_name=request.form["last_name"],
             email=request.form["email"],
             password=request.form["password"],
             role=request.form["role"]
+        )
+
+        ActivityService.log(
+            action="CREATE_USER",
+            description=f"Se creó el usuario {new_user.first_name} {new_user.last_name}",
+            user=f"{current_user.first_name} {current_user.last_name}"
         )
 
         flash("Usuario creado correctamente.", "success")
@@ -58,16 +68,11 @@ def edit(user_id):
 
     if request.method == "POST":
 
-        UserService.update_user(
-            user_id=user.id,
-            first_name=request.form["first_name"],
-            last_name=request.form["last_name"],
-            email=request.form["email"],
-            role=request.form["role"]
+        ActivityService.log(
+            action="UPDATE_USER",
+            description=f"Se actualizó el usuario {user.first_name} {user.last_name}",
+            user=current_user.email
         )
-
-        flash("Usuario actualizado correctamente.", "success")
-
         return redirect("/users")
 
     return render_template(
@@ -80,9 +85,15 @@ def edit(user_id):
 def deactivate(user_id):
 
     UserService.deactivate_user(user_id)
+    user = UserService.get_user(user_id)
 
-    flash("Usuario desactivado correctamente.", "warning")
+    if user:
 
+        ActivityService.log(
+            action="DEACTIVATE_USER",
+            description=f"Se desactivó el usuario {user.first_name} {user.last_name}",
+            user=current_user.email
+        )
     return redirect("/users")
 
 @users_bp.route("/activate/<int:user_id>")
@@ -91,7 +102,13 @@ def deactivate(user_id):
 def activate(user_id):
 
     UserService.activate_user(user_id)
+    user = UserService.get_user(user_id)
 
-    flash("Usuario activado correctamente.", "success")
+    if user:
 
+        ActivityService.log(
+            action="ACTIVATE_USER",
+            description=f"Se activó el usuario {user.first_name} {user.last_name}",
+            user=current_user.email
+        )
     return redirect("/users")
